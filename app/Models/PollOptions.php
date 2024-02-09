@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Poll extends Model
+class PollOptions extends Model
 {
     use HasFactory;
 
@@ -14,8 +14,8 @@ class Poll extends Model
         'title',
     ];
 
-    public function options(): HasMany
+    public function poll(): BelongsTo
     {
-        return $this->hasMany(PollOptions::class);
+        return $this->belongsTo(Poll::class);
     }
 }
