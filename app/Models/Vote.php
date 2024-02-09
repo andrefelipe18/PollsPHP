@@ -5,23 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class PollOptions extends Model
+class Vote extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-    ];
+    protected $fillable = ['user_id', 'poll_id', 'poll_option_id'];
 
     public function poll(): BelongsTo
     {
         return $this->belongsTo(Poll::class);
     }
 
-    public function votes(): HasMany
+    public function pollOption(): BelongsTo
     {
-        return $this->hasMany(Vote::class);
+        return $this->belongsTo(PollOptions::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
