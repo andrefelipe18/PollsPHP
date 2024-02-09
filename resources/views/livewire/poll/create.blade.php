@@ -1,7 +1,8 @@
 <?php
 
-use function Livewire\Volt\{state, rules};
-use App\Models\Poll;
+use function Livewire\Volt\{state, rules, mount};
+use App\Models\{Poll, PollOptions};
+use Illuminate\Support\Facades\DB;
 
 rules(fn () => [
     'title' => ['required', 'min:10', 'max:255'],
@@ -17,37 +18,68 @@ rules(fn () => [
 state(['title' => '']);
 state(['options' => []]);
 
+mount(function () {
+    $this->options = [''];
+});
+
+$addOption = function() {
+    $this->options[] = '';
+};
+
 $savePoll = function() {
     $this->validate();
 
-    $poll = Poll::create([
-        'title' => $this->title
-    ]);
-
-    foreach($this->options as $option) {
-        $poll->options()->create([
-            'title' => $option
+    DB::transaction(function () {
+        $poll = Poll::create([
+            'title' => $this->title,
+            'user_id' => auth()->id(),
         ]);
-    }
-
-    $this->reset();
-    $this->dispatch('newPoll');
+        foreach($this->options as $option) {
+            PollOptions::create([
+                'title' => $option,
+                'poll_id' => $poll->id
+            ]);
+        }
+        $this->reset();
+        $this->dispatch('newPoll');
+    });
 };
 ?>
 
 <div>
-    <form action="" wire:submit.prevent='savePoll'>
+    <form>
         @csrf
-        <x-ts-input wire:model="title" label="Insert Poll Title" />
+        <x-ts-input wire:model="title" id="form_create_poll" label="Insert Poll Title" />
 
-        <div class="flex mt-4 gap-4">
-            <x-ts-checkbox value="Livewire" wire:model='options' label="Livewire" color='fuchsia' />
-            <x-ts-checkbox value="AlpineJS" wire:model='options' label="AlpineJS" color='gray' />
-            <x-ts-checkbox value="Tailwind" wire:model='options' label="Tailwind" color='sky' />
-            <x-ts-checkbox value="Laravel" wire:model='options' label="Laravel" color='red' />
-
+        <div class="flex flex-col gap-4 mt-4">
+            @foreach($options as $index => $option)
+            <x-ts-input wire:model="options.{{ $index }}" label="Option {{ $index + 1 }}" />
+            @endforeach
         </div>
 
-        <x-ts-button type="submit" class="mb-12 mt-4">Create Poll</x-ts-button>
+        <x-ts-button wire:click="addOption" id="addOption" class="mt-4">Add Option</x-ts-button>
+
+        <x-ts-button wire:click='savePoll' id="savePoll" type="submit" class="mt-4 mb-12" color="emerald">Create Poll
+        </x-ts-button>
     </form>
 </div>
+
+@script
+<script>
+    let form = document.getElementById('form_create_poll');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+    });
+
+    let addOption = document.getElementById('addOption');
+    addOption.addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+
+    let savePoll = document.getElementById('savePoll');
+    savePoll.addEventListener('click', function(event) {
+        event.preventDefault();
+    });
+
+</script>
+@endscript

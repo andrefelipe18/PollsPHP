@@ -13,6 +13,7 @@ class PollOptions extends Model
 
     protected $fillable = [
         'title',
+        'poll_id',
     ];
 
     public function poll(): BelongsTo
