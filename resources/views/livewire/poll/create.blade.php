@@ -1,16 +1,24 @@
 <?php
 
-use function Livewire\Volt\{state};
+use function Livewire\Volt\{state, rules};
 use App\Models\Poll;
+
+rules(fn () => [
+    'title' => ['required', 'min:10', 'max:255'],
+    'options' => ['required', 'min:2']
+])->messages([
+    'title.required' => 'The title is required',
+    'title.min' => 'The title must be at least 10 characters',
+    'title.max' => 'The title must be at most 255 characters',
+    'options.required' => 'The options are required',
+    'options.min' => 'The options must be at least 2'
+]);
 
 state(['title' => '']);
 state(['options' => []]);
 
 $savePoll = function() {
-    $this->validate([
-        'title' => 'required',
-        'options' => 'required'
-    ]);
+    $this->validate();
 
     $poll = Poll::create([
         'title' => $this->title
@@ -23,18 +31,12 @@ $savePoll = function() {
     }
 
     $this->reset();
-    session()->flash('message', 'Poll created successfully');
+    $this->dispatch('newPoll');
 };
 ?>
 
 <div>
-    @if(session()->has('message'))
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
-        <p class="font-bold">Success</p>
-        <p>{{ session('message') }}</p>
-    </div>
-    @endif
-    <form action="" wire:submit='savePoll'>
+    <form action="" wire:submit.prevent='savePoll'>
         @csrf
         <x-ts-input wire:model="title" label="Insert Poll Title" />
 
@@ -43,8 +45,9 @@ $savePoll = function() {
             <x-ts-checkbox value="AlpineJS" wire:model='options' label="AlpineJS" color='gray' />
             <x-ts-checkbox value="Tailwind" wire:model='options' label="Tailwind" color='sky' />
             <x-ts-checkbox value="Laravel" wire:model='options' label="Laravel" color='red' />
+
         </div>
 
-        <x-ts-button type="submit" class="mt-4">Create Poll</x-ts-button>
+        <x-ts-button type="submit" class="mb-12 mt-4">Create Poll</x-ts-button>
     </form>
 </div>
