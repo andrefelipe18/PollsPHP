@@ -36,7 +36,8 @@ on(['newPoll' => function () {
     @foreach ($polls as $poll)
     <div class="mb-12">
         <x-ts-card :header="$poll->title">
-            <p class="text-gray-800 mb-1">Vote in the in one option below:</p>
+            <p>Author: {{ $poll->user->name }}</p>
+            <p class="mb-1 text-gray-800">Vote in the in one option below:</p>
             @foreach ($poll->options as $option)
             <div class="flex items-center gap-4">
                 <x-ts-radio class="mt-2" wire:model='optionSelected' value="{{ $option->id }}"
