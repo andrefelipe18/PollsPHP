@@ -1,24 +1,39 @@
 <?php
 
 use function Livewire\Volt\{state};
+use App\Models\Poll;
 
 state(['title' => '']);
 state(['options' => []]);
 
 $savePoll = function() {
-    dd($this->options);
     $this->validate([
-        'title' => 'required'
+        'title' => 'required',
+        'options' => 'required'
     ]);
 
     $poll = Poll::create([
         'title' => $this->title
     ]);
-    
+
+    foreach($this->options as $option) {
+        $poll->options()->create([
+            'title' => $option
+        ]);
+    }
+
+    $this->reset();
+    session()->flash('message', 'Poll created successfully');
 };
 ?>
 
 <div>
+    @if(session()->has('message'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4" role="alert">
+        <p class="font-bold">Success</p>
+        <p>{{ session('message') }}</p>
+    </div>
+    @endif
     <form action="" wire:submit='savePoll'>
         @csrf
         <x-ts-input wire:model="title" label="Insert Poll Title" />
