@@ -1,18 +1,27 @@
 <?php
 
 use function Livewire\Volt\{state, mount, on};
-use App\Models\Poll;
+use App\Models\{Poll, PollOptions, Vote};
 
 state(['polls' => Poll::all()]);
 state('optionSelected', null);
 
 $voteInOption = function() {
     if($this->optionSelected) {
-        $option = Poll::find($this->optionSelected);
+        $option = PollOptions::find($this->optionSelected);
+
+        $vote = Vote::where('user_id', auth()->id())
+            ->where('poll_id', $option->poll_id)
+            ->first();
+
+        if($vote) {
+            $vote->delete();
+        }
+
         $option->votes()->create([
             'user_id' => auth()->id(),
             'poll_id' => $option->poll_id,
-            'option_id' => $option->id
+            'poll_options_id' => $option->id
         ]);
     }
     $this->optionSelected = null;
