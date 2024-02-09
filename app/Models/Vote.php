@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Poll;
+use App\Models\PollOptions;
+use App\Models\User;
 
 class Vote extends Model
 {
@@ -19,7 +22,7 @@ class Vote extends Model
 
     public function pollOption(): BelongsTo
     {
-        return $this->belongsTo(PollOptions::class);
+        return $this->belongsTo(PollOptions::class, 'poll_options_id');
     }
 
     public function user(): BelongsTo
