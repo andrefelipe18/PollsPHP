@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state, mount, on};
 use App\Models\{Poll, PollOptions, Vote};
+use App\Jobs\SendVoteOptionEmail;
 
 state(['polls' => Poll::all()]);
 state('optionSelected', null);
@@ -23,6 +24,10 @@ $voteInOption = function() {
             'poll_id' => $option->poll_id,
             'poll_options_id' => $option->id
         ]);
+
+        $user = auth()->user();
+        $author = $option->poll->user;
+        SendVoteOptionEmail::dispatch($option, $author, $user)->onQueue('emails');
     }
     $this->optionSelected = null;
 };
@@ -36,7 +41,7 @@ on(['newPoll' => function () {
     @foreach ($polls as $poll)
     <div class="mb-12">
         <x-ts-card :header="$poll->title">
-            <p>Author: {{ $poll->user->name }}</p>
+            <p>Author: {{ $poll->user->name === Auth::user()->name ? "Your poll" : $poll->user->name }}</p>
             <p class="mb-1 text-gray-800">Vote in the in one option below:</p>
             @foreach ($poll->options as $option)
             <div class="flex items-center gap-4">

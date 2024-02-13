@@ -1,25 +1,22 @@
 <?php
 
-use function Livewire\Volt\{state, rules, mount};
+use function Livewire\Volt\{state, rules, mount, uses};
 use App\Models\{Poll, PollOptions};
 use Illuminate\Support\Facades\DB;
+use TallStackUi\Traits\Interactions;
+
+uses([Interactions::class]);
 
 rules(fn () => [
     'title' => ['required', 'min:10', 'max:255'],
     'options' => ['required', 'min:2']
-])->messages([
-    'title.required' => 'The title is required',
-    'title.min' => 'The title must be at least 10 characters',
-    'title.max' => 'The title must be at most 255 characters',
-    'options.required' => 'The options are required',
-    'options.min' => 'The options must be at least 2'
 ]);
 
 state(['title' => '']);
 state(['options' => []]);
 
 mount(function () {
-    $this->options = [''];
+    $this->options = ['', ''];
 });
 
 $addOption = function() {
@@ -29,20 +26,31 @@ $addOption = function() {
 $savePoll = function() {
     $this->validate();
 
-    DB::transaction(function () {
+    DB::beginTransaction(); //Inicia uma transaction
+    try {
         $poll = Poll::create([
             'title' => $this->title,
             'user_id' => auth()->id(),
         ]);
-        foreach($this->options as $option) {
-            PollOptions::create([
+
+        $options = collect($this->options)->map(function ($option) use ($poll) {
+            return [
                 'title' => $option,
-                'poll_id' => $poll->id
-            ]);
-        }
-        $this->reset();
+                'poll_id' => $poll->id,
+            ];
+        })->toArray();
+
+        PollOptions::insert($options);
+
+        $this->title = '';
+        $this->options = [''];
+        $this->toast()->success('Poll created successfully!')->send();
         $this->dispatch('newPoll');
-    });
+    } catch (\Exception $e) {
+        DB::rollBack();
+        $this->toast()->error('Error creating poll!')->send();
+    }
+    DB::commit();
 };
 ?>
 
