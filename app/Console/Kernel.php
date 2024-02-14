@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Faz um queue:work a cada minuto para processar as filas
+        $schedule->command('queue:work --stop-when-empty')->everyTwoMinutes()->withoutOverlapping();
     }
 
     /**
@@ -20,7 +21,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

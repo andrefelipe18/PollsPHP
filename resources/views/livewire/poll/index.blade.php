@@ -27,7 +27,7 @@ $voteInOption = function() {
 
         $user = auth()->user();
         $author = $option->poll->user;
-        SendVoteOptionEmail::dispatch($option, $author, $user)->onQueue('emails');
+        SendVoteOptionEmail::dispatch($option, $author, $user);
     }
     $this->optionSelected = null;
 };
