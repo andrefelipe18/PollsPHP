@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // Faz um queue:work a cada minuto para processar as filas
-        $schedule->command('queue:work --stop-when-empty')->everyTwoMinutes()->withoutOverlapping();
+        // $schedule->command('queue:work --stop-when-empty')->everyTwoMinutes()->withoutOverlapping();
     }
 
     /**

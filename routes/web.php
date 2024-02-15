@@ -19,6 +19,10 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+    Route::view('messages', 'messages')
+    ->middleware(['auth', 'verified'])
+    ->name('messages');
+
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
