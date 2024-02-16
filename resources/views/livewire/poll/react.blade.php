@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state,mount, on};
 use \App\Models\PollReaction;
+use \App\Events\NewReactionEvent;
 
 state(['quantity' => 0]);
 state(['reaction' => '']);
@@ -34,16 +35,19 @@ $react = function(string $reaction) {
 
     if($userHasReacted && $userHasReacted->reaction !== $reaction) {
         $userHasReacted->update(['reaction' => $reaction]);
+        NewReactionEvent::dispatch($userHasReacted);
         return;
     }
 
-    PollReaction::create([
+    $react = PollReaction::create([
         'poll_id' => $this->poll->id,
         'reaction' => $reaction,
         'user_id' => auth()->id()
     ]);
 
     $this->quantity++;
+
+    NewReactionEvent::dispatch($react);
 };
 
 ?>
