@@ -50,7 +50,7 @@ on(['newPoll' => function () {
                 <x-ts-badge>{{ $option->votes->count() }}</x-ts-badge>
             </div>
             @endforeach
-            @livewire('poll.react')
+            <livewire:poll.react :poll="$poll" />
             <x-ts-button class="mt-2" wire:click='voteInOption'>Vote</x-ts-button>
         </x-ts-card>
     </div>

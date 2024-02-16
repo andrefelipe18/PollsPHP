@@ -22,3 +22,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('newmessage', function (User $user) {
     return true;
 });
+
+Broadcast::channel('pollreaction', function (User $user) {
+    return true;
+});
