@@ -7,6 +7,8 @@ use App\Events\NewMessageEvent;
 
 state(['messages' => []]);
 state(['content' => '']);
+state(['isDisabled' => false]);
+
 
 mount(function(){
     $this->messages = Message::latest()->take(10)->get();
@@ -33,6 +35,10 @@ on(['echo-private:newmessage,NewMessageEvent'=>function($data){
 ?>
 
 <div>
+    <x-ts-input label="Name" hint="Insert your name" :disabled="$isDisabled" />
+    <x-ts-button wire:click="$set('isDisabled', true)">
+        Disable
+    </x-ts-button>
     <h1>Messages</h1>
     <ul>
         @foreach($messages as $message)
